@@ -1,0 +1,93 @@
+{
+  "keywords": [
+    "wireless mouse",
+    "mechanical keyboard"
+  ],
+  "trackedProducts": [
+    {
+      "productId": "1005010598380794",
+      "title": "로지텍 M650 M650L 무선 블루투스 무소음 마우스 사무실 노트북 센서 기술 고급 광학 프로그래밍 가능 버튼 마우스",
+      "image": "https://ae01.alicdn.com/kf/S33b7efddc50140358204d80bc496b4a9w.jpg?has_lang=1&ver=2",
+      "keyword": "wireless mouse",
+      "platform": "aliexpress"
+    },
+    {
+      "productId": "1005008556187260",
+      "title": "2.4G 무선 마우스 인체 공학적 조정 가능한 800-1200-1600 DPI PC/노트북/Macbook Pro 용 경량 충전식 오피스 게임용 마우스",
+      "image": "https://ae01.alicdn.com/kf/S477d07b3ce1a4f908b59c6d887d8c9bfm.jpg",
+      "keyword": "wireless mouse",
+      "platform": "aliexpress"
+    },
+    {
+      "productId": "1005007247038480",
+      "title": "VXE Dragonfly R1 무선 마우스 PAW3395 센서 북유럽 52840 2KHz FPS 게임 마우스 지능형 속도 저 지연 게임 사무실",
+      "image": "https://ae01.alicdn.com/kf/S878d2a33df2c466eb851f69e0f117044P.jpg",
+      "keyword": "wireless mouse",
+      "platform": "aliexpress"
+    },
+    {
+      "productId": "1005010487219989",
+      "title": "무선 마우스 2.4GHz 블루투스 충전식 마우스 USB 백라이트가 있는 조용한 인체공학적 게임용 마우스 PC 노트북용 1600DPI 마우스",
+      "image": "https://ae01.alicdn.com/kf/S9ce910ec6cf5422a8f9a4a74cf84760f8.jpg",
+      "keyword": "wireless mouse",
+      "platform": "aliexpress"
+    }
+  ],
+  "history": {
+    "1005010598380794": [
+      {
+        "date": "2026-01-30",
+        "price": 4513,
+        "reviews": 97
+      }
+    ],
+    "1005008556187260": [
+      {
+        "date": "2026-01-30",
+        "price": 4322,
+        "reviews": 149
+      }
+    ],
+    "1005007247038480": [
+      {
+        "date": "2026-01-30",
+        "price": 22914,
+        "reviews": 1070
+      }
+    ],
+    "1005010487219989": [
+      {
+        "date": "2026-01-30",
+        "price": 3680,
+        "reviews": 238
+      }
+    ]
+  },
+  "insights": {
+    "wireless mouse": {
+      "lowestPrice": 3680,
+      "itemCount": 4,
+      "updatedAt": "2026-01-30T05:41:25.822Z",
+      "top3": [
+        {
+          "id": "1005010487219989",
+          "title": "무선 마우스 2.4GHz 블루투스 충전식 마우스 USB 백라이트가 있는 조용한 인체공학적 게임용 마우스 PC 노트북용 1600DPI 마우스",
+          "price": 3680,
+          "image": "https://ae01.alicdn.com/kf/S9ce910ec6cf5422a8f9a4a74cf84760f8.jpg"
+        },
+        {
+          "id": "1005008556187260",
+          "title": "2.4G 무선 마우스 인체 공학적 조정 가능한 800-1200-1600 DPI PC/노트북/Macbook Pro 용 경량 충전식 오피스 게임용 마우스",
+          "price": 4322,
+          "image": "https://ae01.alicdn.com/kf/S477d07b3ce1a4f908b59c6d887d8c9bfm.jpg"
+        },
+        {
+          "id": "1005010598380794",
+          "title": "로지텍 M650 M650L 무선 블루투스 무소음 마우스 사무실 노트북 센서 기술 고급 광학 프로그래밍 가능 버튼 마우스",
+          "price": 4513,
+          "image": "https://ae01.alicdn.com/kf/S33b7efddc50140358204d80bc496b4a9w.jpg?has_lang=1&ver=2"
+        }
+      ]
+    }
+  }
+}

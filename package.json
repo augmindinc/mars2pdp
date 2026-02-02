@@ -1,0 +1,59 @@
+{
+  "name": "aliexpress-product-scraper",
+  "version": "3.0.0",
+  "description": "Get Aliexpress product details as a json reponse including feedbacks, variants, description, images, etc.,",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "smoke": "node ./scripts/smoke.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix"
+    ]
+  },
+  "keywords": [
+    "aliexpress",
+    "aliexpress-crawler",
+    "aliexpress-spider",
+    "aliexpress-api",
+    "aliexpress-dropship",
+    "aliexpress-dropshipping",
+    "dropship",
+    "dropshipping",
+    "aliexpress-scraper",
+    "aliexpress-product-scraper",
+    "aliexpress-product-json",
+    "product-scraper",
+    "product-json",
+    "scraper",
+    "crawler",
+    "spider"
+  ],
+  "author": "Sudheer Ranga",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "@faker-js/faker": "10.2.0",
+    "cheerio": "1.1.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "node-cron": "^4.2.1",
+    "node-fetch": "3.3.2",
+    "puppeteer": "24.34.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  }
+}
