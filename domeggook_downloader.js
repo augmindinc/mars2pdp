@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
 import DomeggookScraper from './src/domeggookScraper.js';
-import { removeBackground, performOCR, cleanOCRText } from './src/imageProcessor.js';
+import { performOCR, cleanOCRText } from './src/imageProcessor.js';
 
 /**
  * Utility to download an image from a URL
@@ -68,7 +68,7 @@ async function scrapeAndDownload(productId) {
 
         console.log(`📂 Created directory: ${outputDir}`);
 
-        // 2. Download Thumbnail Images & Remove BG
+        // 2. Download Thumbnail Images
         console.log('🖼️ Downloading thumbnail images...');
         const thumbnailUrls = data.images || [];
         const thumbPaths = [];
@@ -79,10 +79,6 @@ async function scrapeAndDownload(productId) {
             const fullPath = path.join(imagesDir, fileName);
             if (await downloadImage(url, fullPath)) {
                 thumbPaths.push(fullPath);
-                // Remove background for the primary thumbnail
-                if (i === 0) {
-                    await removeBackground(fullPath);
-                }
             }
         }
 

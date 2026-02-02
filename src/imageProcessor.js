@@ -1,28 +1,4 @@
-import { execSync } from 'child_process';
-import path from 'path';
-import fs from 'fs';
 import { createWorker } from 'tesseract.js';
-
-/**
- * Remove background from an image using the Python script
- */
-export async function removeBackground(inputPath) {
-    const dir = path.dirname(inputPath);
-    const ext = path.extname(inputPath);
-    const base = path.basename(inputPath, ext);
-    const outputPath = path.join(dir, `${base}_nobg.png`);
-
-    console.log(`🎨 Removing background: ${inputPath} -> ${outputPath}`);
-
-    try {
-        const scriptPath = path.join(process.cwd(), 'scripts', 'remove_bg.py');
-        execSync(`python3 "${scriptPath}" "${inputPath}" "${outputPath}"`, { stdio: 'inherit' });
-        return outputPath;
-    } catch (error) {
-        console.error(`Failed to remove background for ${inputPath}:`, error.message);
-        return null;
-    }
-}
 
 /**
  * Perform OCR on an image and return text
