@@ -42,7 +42,7 @@ const DomeggookScraper = async (id, { timeout = 60000 } = {}) => {
         const $ = cheerio.load(content);
 
         // 1. Title
-        const title = $("h1.lInfoRow").text().trim();
+        const title = $("h1.lInfoRow").text().trim() || $(".lItemTitle").text().trim();
 
         // 2. Prices
         const prices = [];
@@ -175,6 +175,33 @@ const DomeggookScraper = async (id, { timeout = 60000 } = {}) => {
             });
         } catch (e) {
             console.log("Failed to fetch detailed options", e.message);
+        }
+
+        // 10. Fallback for single-option products
+        if (options.length === 0) {
+            let mainPrice = prices.length > 0 ? prices[0].price : "N/A";
+
+            // Try direct selection if table extraction failed
+            if (mainPrice === "N/A") {
+                const priceText = $(".lItemPrice, .lPrice").text().trim();
+                const priceMatch = priceText.match(/([0-9,]+)\s*원/);
+                if (priceMatch) mainPrice = priceMatch[1] + "원";
+            }
+
+            let mainStock = specs.find(s => s.attrName === "재고수량")?.attrValue || "N/A";
+            if (mainStock === "N/A") {
+                // Try searching in the entire info body for stock pattern
+                const stockMatch = $(".lInfoBody").text().match(/재고수량\s*([0-9,]+개)/);
+                if (stockMatch) mainStock = stockMatch[1];
+            }
+
+            options.push({
+                code: "00",
+                name: "(단일옵션) " + (title || id),
+                price: mainPrice,
+                realPrice: mainPrice,
+                stock: mainStock
+            });
         }
 
         await browser.close();

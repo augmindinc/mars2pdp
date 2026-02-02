@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
 import DomeggookScraper from './src/domeggookScraper.js';
+import { removeBackground, performOCR, cleanOCRText } from './src/imageProcessor.js';
 
 /**
  * Utility to download an image from a URL
@@ -36,20 +37,11 @@ function slugify(text) {
 
 /**
  * Very basic mock translation for the folder name
- * In a real app, you might use a translation API
  */
 function translateTitleToEnglish(title) {
     if (!title) return "product";
-
-    // For specific common cases or if we want to be fancy
-    // But since we are an AI, we can provide a better name if we are running this.
-    // However, as a standalone script, we'll just return the slugified title 
-    // unless it's pure Korean, then we might use the ID.
     const isKorean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(title);
     if (!isKorean) return slugify(title);
-
-    // Fallback to a generic name or use the ID if we can't translate
-    // But for the user, I will manually provide the translation for the run below.
     return slugify(title);
 }
 
@@ -64,7 +56,6 @@ async function scrapeAndDownload(productId) {
 
         // 1. Prepare folder
         let englishTitle = translateTitleToEnglish(data.title);
-        // If it's still Korean, let's at least prepend the ID to be unique
         if (/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(englishTitle)) {
             englishTitle = `domeggook-${productId}`;
         }
@@ -77,27 +68,44 @@ async function scrapeAndDownload(productId) {
 
         console.log(`📂 Created directory: ${outputDir}`);
 
-        // 2. Download Thumbnail Images
+        // 2. Download Thumbnail Images & Remove BG
         console.log('🖼️ Downloading thumbnail images...');
         const thumbnailUrls = data.images || [];
+        const thumbPaths = [];
         for (let i = 0; i < thumbnailUrls.length; i++) {
             const url = thumbnailUrls[i];
             const ext = path.extname(url).split('?')[0] || '.jpg';
             const fileName = `thumb_${i + 1}${ext}`;
-            await downloadImage(url, path.join(imagesDir, fileName));
+            const fullPath = path.join(imagesDir, fileName);
+            if (await downloadImage(url, fullPath)) {
+                thumbPaths.push(fullPath);
+                // Remove background for the primary thumbnail
+                if (i === 0) {
+                    await removeBackground(fullPath);
+                }
+            }
         }
 
-        // 3. Download Detail Images
-        console.log('🖼️ Downloading detail images...');
+        // 3. Download Detail Images & OCR
+        console.log('🖼️ Downloading detail images & performing OCR...');
         const detailImageUrls = data.detailImages || [];
+        let extractedContent = "";
         for (let i = 0; i < detailImageUrls.length; i++) {
             const url = detailImageUrls[i];
-            // Skip tracking pixels or small icons if any
             if (url.includes('spacer.gif') || url.includes('pixel')) continue;
 
             const ext = path.extname(url).split('?')[0] || '.jpg';
             const fileName = `detail_${i + 1}${ext}`;
-            await downloadImage(url, path.join(imagesDir, fileName));
+            const fullPath = path.join(imagesDir, fileName);
+
+            if (await downloadImage(url, fullPath)) {
+                // Perform OCR
+                const text = await performOCR(fullPath);
+                const cleaned = cleanOCRText(text);
+                if (cleaned) {
+                    extractedContent += `\n### Detail Image ${i + 1} Content\n\n${cleaned}\n`;
+                }
+            }
         }
 
         // 4. Create Markdown file
@@ -129,8 +137,6 @@ async function scrapeAndDownload(productId) {
             data.specs.forEach(spec => {
                 mdContent += `- **${spec.attrName}**: ${spec.attrValue}\n`;
             });
-        } else {
-            mdContent += `No specifications found.\n`;
         }
 
         mdContent += `\n## Supplier Information (공급사정보)\n\n`;
@@ -138,8 +144,6 @@ async function scrapeAndDownload(productId) {
             data.supplierInfo.forEach(info => {
                 mdContent += `- **${info.label}**: ${info.value}\n`;
             });
-        } else {
-            mdContent += `No supplier information found.\n`;
         }
 
         mdContent += `\n## Return/Exchange Information (반품/교환정보)\n\n`;
@@ -147,9 +151,10 @@ async function scrapeAndDownload(productId) {
             data.returnInfo.forEach(info => {
                 mdContent += `- **${info.label}**: ${info.value}\n`;
             });
-        } else {
-            mdContent += `No return/exchange information found.\n`;
         }
+
+        mdContent += `\n## OCR Extracted Content\n\n`;
+        mdContent += extractedContent || "No text extracted from images.\n";
 
         mdContent += `\n## Features / Description\n\n`;
         mdContent += `Detail images have been downloaded to the \`images/\` folder.\n\n`;

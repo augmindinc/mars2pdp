@@ -3,6 +3,7 @@ import path from 'path';
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
 import AliexpressProductScraper from './src/aliexpressProductScraper.js';
+import { removeBackground, performOCR, cleanOCRText } from './src/imageProcessor.js';
 
 /**
  * Utility to download an image from a URL
@@ -72,19 +73,25 @@ async function scrapeAndDownload(productId) {
 
         console.log(`📂 Created directory: ${outputDir}`);
 
-        // 2. Download Thumbnail Images
+        // 2. Download Thumbnail Images & Remove BG
         console.log('🖼️ Downloading thumbnail images...');
         const thumbnailUrls = data.images || [];
         for (let i = 0; i < thumbnailUrls.length; i++) {
             const url = thumbnailUrls[i];
             const ext = path.extname(url).split('?')[0] || '.jpg';
             const fileName = `thumb_${i + 1}${ext}`;
-            await downloadImage(url, path.join(imagesDir, fileName));
+            const fullPath = path.join(imagesDir, fileName);
+            if (await downloadImage(url, fullPath)) {
+                if (i === 0) {
+                    await removeBackground(fullPath);
+                }
+            }
         }
 
-        // 3. Download Detail Images from description
-        console.log('🖼️ Extracting and downloading detail images...');
+        // 3. Download Detail Images from description & OCR
+        console.log('🖼️ Extracting and downloading detail images & OCR...');
         const detailImageUrls = extractImagesFromHtml(data.description);
+        let extractedContent = "";
         for (let i = 0; i < detailImageUrls.length; i++) {
             const url = detailImageUrls[i];
             // Skip tracking pixels or small icons if any
@@ -92,7 +99,14 @@ async function scrapeAndDownload(productId) {
 
             const ext = path.extname(url).split('?')[0] || '.jpg';
             const fileName = `detail_${i + 1}${ext}`;
-            await downloadImage(url, path.join(imagesDir, fileName));
+            const fullPath = path.join(imagesDir, fileName);
+            if (await downloadImage(url, fullPath)) {
+                const text = await performOCR(fullPath);
+                const cleaned = cleanOCRText(text);
+                if (cleaned) {
+                    extractedContent += `\n### Detail Image ${i + 1} Content\n\n${cleaned}\n`;
+                }
+            }
         }
 
         // 4. Create Markdown file
@@ -110,9 +124,10 @@ async function scrapeAndDownload(productId) {
             data.specs.forEach(spec => {
                 mdContent += `- **${spec.attrName}**: ${spec.attrValue}\n`;
             });
-        } else {
-            mdContent += `No specifications found.\n`;
         }
+
+        mdContent += `\n## OCR Extracted Content\n\n`;
+        mdContent += extractedContent || "No text extracted from images.\n";
 
         mdContent += `\n## Features / Description\n\n`;
         // We could extract text from HTML description if needed, 
