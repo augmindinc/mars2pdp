@@ -15,17 +15,18 @@ async function runTask4_2(targetId) {
 
     const analysisPrompt = `
         너는 '나노바나나(Nano Banana)' 크리에이티브 MD 에이전트야.
-        첨부된 상품 원본 이미지를 분석해서, 이 상품의 '핵심 실물 피처'를 10가지 키워드로 뽑아줘.
+        첨부된 상품 원본 이미지를 분석해서, 이 상품의 '핵심 실물 피처'를 5가지 키워드로 뽑아줘.
         단, 실제 존재하지 않는 허위 패키징이나 박스는 제외하고 오직 '상품 내용물'과 '실제 조리/사용 모습'에 집중해.
         
-        그리고 이 피처들을 활용해서 10가지 다른 구도의 프리미엄 상품샷을 생성하기 위한 
+        그리고 이 피처들을 활용해서 가장 임팩트 있는 **3가지** 다른 구도의 프리미엄 상품샷을 생성하기 위한 
         나노바나나 전용 이미지 생성 프롬프트(영어)를 JSON 배열로 만들어줘.
         
         {
             "features": ["키워드1", "키워드2", ...],
             "prompts": [
-                "Detailed prompt for shot 1 (Realistic, cinematic lighting, focused on content)...",
-                ...
+                "Detailed prompt for shot 1 (Main Hero Shot)...",
+                "Detailed prompt for shot 2 (Action/Usage Shot)...",
+                "Detailed prompt for shot 3 (Texture/Macro Shot)..."
             ]
         }
     `;
