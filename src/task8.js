@@ -7,11 +7,25 @@ async function runTask8(targetId) {
     const filePath = path.join(process.cwd(), "outputs", targetId, "NEW_DETAILS_KO.md");
     const koText = await fs.readFile(filePath, "utf-8");
 
-    const languages = [
+    const targetLang = process.argv[3]; // Optional: EN, JA, ZH
+
+    const allLanguages = [
         { code: "EN", name: "English" },
         { code: "JA", name: "Japanese" },
         { code: "ZH", name: "Chinese (Simplified)" }
     ];
+
+    const languages = targetLang
+        ? allLanguages.filter(l => l.code.toUpperCase() === targetLang.toUpperCase())
+        : [];
+
+    if (languages.length === 0 && !targetLang) {
+        console.log("ℹ️ No target language specified. Usage: node src/task8.js <targetId> <EN|JA|ZH>");
+        return;
+    } else if (languages.length === 0) {
+        console.log(`❌ Unsupported language code: ${targetLang}`);
+        return;
+    }
 
     for (const lang of languages) {
         console.log(`Translating to ${lang.name}...`);
@@ -33,5 +47,9 @@ async function runTask8(targetId) {
     }
 }
 
-const targetId = process.argv[2] || "domeggook-63319623";
+const targetId = process.argv[2];
+if (!targetId) {
+    console.log("Usage: node src/task8.js <targetId> [EN|JA|ZH]");
+    process.exit(1);
+}
 runTask8(targetId).catch(console.error);
