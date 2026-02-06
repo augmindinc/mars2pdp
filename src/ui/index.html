@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nano Banana | Premium PDP Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <header>
+        <div class="logo">NANO BANANA</div>
+        <div class="subtitle">AI-POWERED PRODUCT DETAIL AGENT</div>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search products in Domeggook..." value="텀블러">
+        <button class="search-btn" onclick="searchProducts()">SEARCH</button>
+    </div>
+
+    <div id="loading" class="loading-container" style="display: none;">
+        <span class="loader"></span>
+        <p>Analyzing marketplace...</p>
+    </div>
+
+    <div id="productGrid" class="product-grid">
+        <!-- Products will be injected here -->
+    </div>
+
+    <div id="overlay" class="overlay">
+        <div class="status-box">
+            <span class="loader"></span>
+            <h2 id="statusTitle">Generating Premium PDP</h2>
+            <p id="statusMsg">This may take a minute...</p>
+            <div id="statusLog" class="status-log">
+                > Initializing agent...<br>
+                > Loading Gemini models...
+            </div>
+            <button id="closeBtn" class="search-btn" style="margin-top: 2rem; display: none;" onclick="closeOverlay()">DONE</button>
+        </div>
+    </div>
+
+    <script>
+        async function searchProducts() {
+            const keyword = document.getElementById('searchInput').value;
+            const grid = document.getElementById('productGrid');
+            const loading = document.getElementById('loading');
+            
+            grid.innerHTML = '';
+            loading.style.display = 'flex';
+
+            try {
+                const response = await fetch(`/api/search?keyword=${encodeURIComponent(keyword)}`);
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+                
+                if (data.success && data.products.length > 0) {
+                    data.products.forEach(p => {
+                        const card = document.createElement('div');
+                        card.className = 'product-card';
+                        card.onclick = () => generatePDP(p.productId);
+                        
+                        card.innerHTML = `
+                            <div class="sc-tag">DOMEGGOOK</div>
+                            <div class="product-thumb">
+                                <img src="${p.thumbnail}" alt="${p.title}">
+                            </div>
+                            <div class="product-info">
+                                <div class="product-title">${p.title}</div>
+                                <div class="product-price">₩${p.price}</div>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                } else {
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">No products found.</p>';
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                alert('Failed to fetch products: ' + error.message);
+            }
+        }
+
+        async function generatePDP(productId) {
+            const overlay = document.getElementById('overlay');
+            const log = document.getElementById('statusLog');
+            const closeBtn = document.getElementById('closeBtn');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMsg = document.getElementById('statusMsg');
+
+            overlay.classList.add('active');
+            log.innerHTML = `> Targeting ID: ${productId}<br>> Connecting to scraper...`;
+            closeBtn.style.display = 'none';
+            statusTitle.innerText = "Generating Premium PDP";
+            statusMsg.innerText = "This may take a minute...";
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log.innerHTML += `<br>> Data scraped successfully.<br>> Content generated.<br>> Saved to ${data.folder}`;
+                    statusTitle.innerText = "Generation Complete!";
+                    statusMsg.innerText = "The premium PDP is ready.";
+                } else {
+                    log.innerHTML += `<br>!! ERROR: ${data.error}`;
+                    statusTitle.innerText = "Generation Failed";
+                }
+            } catch (error) {
+                log.innerHTML += `<br>!! FATAL ERROR: ${error.message}`;
+                statusTitle.innerText = "Generation Failed";
+            } finally {
+                closeBtn.style.display = 'inline-block';
+            }
+        }
+
+        function closeOverlay() {
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        // Initial search
+        window.onload = searchProducts;
+    </script>
+</body>
+</html>

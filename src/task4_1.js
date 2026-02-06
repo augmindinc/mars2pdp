@@ -33,9 +33,10 @@ async function runTask4_1(targetId) {
         `;
         const result = await agent.analyzeImage(filePath, analysisPrompt);
         console.log(`Analyzing ${file}...`);
+        console.log(`Raw Gemini Response for ${file}:`, result);
 
         try {
-            const parsed = JSON.parse(result.replace(/```json|```/g, ""));
+            const parsed = JSON.parse(result.replace(/```json|```/g, "").trim());
             if (parsed.is_good) {
                 console.log(`✅ Selected for Cutout: ${file}`);
                 // 실제 생성 로직은 나중에 쿼터 회복 시 실행되도록 로직 구성 (예시 프롬프트 출력)
